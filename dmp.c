@@ -173,34 +173,34 @@ static void dmp_dtr(struct dm_target *ti)
 
 static int dmp_map(struct dm_target *ti, struct bio *bio)
 {
-  struct my_dm_target *mdt = (struct my_dm_target *) ti->private;
+	struct my_dm_target *mdt = (struct my_dm_target *) ti->private;
 
-  bio_set_dev(bio, mdt->dev->bdev);
+	bio_set_dev(bio, mdt->dev->bdev);
 
-  dmp_stat.total_queries += 1;
-  dmp_stat.avg_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+	dmp_stat.total_queries += 1;
+	dmp_stat.avg_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
 
-  switch (bio_op(bio)) {
+	switch (bio_op(bio)) {
 
-	  case REQ_OP_READ:
+		case REQ_OP_READ:
 
-		  dmp_stat.read_query_count += 1;
-      dmp_stat.avg_read_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+			dmp_stat.read_query_count += 1;
+			dmp_stat.avg_read_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
 
 		break;
 
 		case REQ_OP_WRITE:
 
-			 dmp_stat.write_query_count += 1;
-    	 dmp_stat.avg_write_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+			dmp_stat.write_query_count += 1;
+			dmp_stat.avg_write_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
 
 		break;
 
 		default:
-			 return DM_MAPIO_KILL;
+			return DM_MAPIO_KILL;
 	}
         
-  submit_bio(bio);
+	submit_bio(bio);
 
 	return DM_MAPIO_SUBMITTED;
 }
