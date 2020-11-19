@@ -70,16 +70,16 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
 
 	const char* text;
   	text = "\
-read:\n\
-  \treqs: %llu \n\
-  \tavg: %llu \n\
-write:\n\
-  \treqs: %llu \n\
-  \tavg: %llu \n\
-total:\n\
-  \treqs: %llu \n\
-  \tavg: %llu \n\
-"; 
+		read:\n\
+			\treqs: %llu \n\
+			\tavg: %llu \n\
+		write:\n\
+			\treqs: %llu \n\
+			\tavg: %llu \n\
+		total:\n\
+			\treqs: %llu \n\
+			\tavg: %llu \n\
+		"; 
 
 	return sprintf(buf, text, dmp_stat.read_query_count,
 					avg_read_block_size,
