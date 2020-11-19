@@ -1,6 +1,6 @@
 # Device Mapper Proxy module for Linux Kernel
 
-This module was tested on Ubuntu 20.04 using Oracle VM VirtualBox
+This module was tested on Ubuntu 20.04
 
 File descriptions:
 * dmp.c - source code
