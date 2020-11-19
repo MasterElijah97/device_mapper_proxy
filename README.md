@@ -11,9 +11,12 @@ File descriptions:
 # How to use
 
 * clone this repo
+```bash 
+git clone https://github.com/MasterElijah97/device_mapper_proxy.git
+```
 * write the following commands
 ```bash
-cd dmp
+cd device_mapper_proxy
 chmod +x ./test.sh
 sudo ./test.sh
 ```
