@@ -18,7 +18,7 @@ static const int BIO_SECTOR_SIZE = 512;
 static struct kobject* stat_kobject;
 
 struct statistics {
-  unsigned long long int write_query_count;
+	unsigned long long int write_query_count;
 	unsigned long long int read_query_count;
 
 	unsigned long long int avg_write_block_size;
@@ -43,33 +43,33 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
                          struct kobj_attribute *attr,
                       	 char *buf)
 {
-  unsigned long long int avg_read_block_size;
-  unsigned long long int avg_write_block_size;
-  unsigned long long int avg_block_size;
+	unsigned long long int avg_read_block_size;
+	unsigned long long int avg_write_block_size;
+	unsigned long long int avg_block_size;
 
 	if (dmp_stat.read_query_count > 0) {
 		avg_read_block_size = 
-      dmp_stat.avg_read_block_size / dmp_stat.read_query_count;
+		dmp_stat.avg_read_block_size / dmp_stat.read_query_count;
 	} else {
 		avg_read_block_size = 0;
 	}
 
 	if (dmp_stat.write_query_count > 0) {
 		avg_write_block_size = 
-      dmp_stat.avg_write_block_size / dmp_stat.write_query_count;
+		dmp_stat.avg_write_block_size / dmp_stat.write_query_count;
 	} else {
 		avg_write_block_size = 0;
 	}
 
 	if (dmp_stat.total_queries > 0) {
 		avg_block_size = 
-      dmp_stat.avg_block_size / dmp_stat.total_queries;
+		dmp_stat.avg_block_size / dmp_stat.total_queries;
 	} else {
 		avg_block_size = 0;
 	}
 
 	const char* text;
-  text = "\
+  	text = "\
 read:\n\
   \treqs: %llu \n\
   \tavg: %llu \n\
@@ -81,33 +81,34 @@ total:\n\
   \tavg: %llu \n\
 "; 
 
-  return sprintf(buf, text, dmp_stat.read_query_count,
-    						            avg_read_block_size,
+	return sprintf(buf, text, dmp_stat.read_query_count,
+					avg_read_block_size,
 
-    						            dmp_stat.write_query_count,
-    						            avg_write_block_size,
+					dmp_stat.write_query_count,
+					avg_write_block_size,
 
-    						            dmp_stat.total_queries,
-    						            avg_block_size);
+					dmp_stat.total_queries,
+					avg_block_size);
 }
 
 static ssize_t dmp_stat_store(struct kobject *kobj, 
-					 	              struct kobj_attribute *attr,
-                      	  const char *buf, 
-                          size_t count) 
+				struct kobj_attribute *attr,
+				const char *buf, 
+				size_t count) 
 {
 	return count;
 }
 
-static struct kobj_attribute stat_attribute =__ATTR(volumes, 0440, dmp_stat_show, dmp_stat_store);
+static struct kobj_attribute stat_attribute =
+	__ATTR(volumes, 0440, dmp_stat_show, dmp_stat_store);
 
 /*
  *	Target part
  */
 
 struct my_dm_target {
-  struct dm_dev *dev;
-  sector_t start;
+	struct dm_dev *dev;
+	sector_t start;
 };
 
 static int dmp_ctr(struct dm_target *ti,
@@ -116,48 +117,48 @@ static int dmp_ctr(struct dm_target *ti,
 {
 	struct my_dm_target *mdt;
 
-  unsigned long long start;
+	unsigned long long start;
 
-  if (argc != 2) {
-    printk(KERN_CRIT "\n Invalid no.of arguments.\n");
+	if (argc != 2) {
+		printk(KERN_CRIT "\n Invalid no.of arguments.\n");
 
-    ti->error = "Invalid argument count";
+		ti->error = "Invalid argument count";
 
-    return -EINVAL;
-  }
+		return -EINVAL;
+	}
 
-  mdt = kmalloc(sizeof(struct my_dm_target), GFP_KERNEL);
+	mdt = kmalloc(sizeof(struct my_dm_target), GFP_KERNEL);
 
-  if(mdt==NULL) {
-    printk(KERN_CRIT "\n Mdt is null\n");
+	if(mdt==NULL) {
+		printk(KERN_CRIT "\n Mdt is null\n");
 
-    ti->error = "dm-basic_target: Cannot allocate linear context";
+		ti->error = "dm-basic_target: Cannot allocate linear context";
 
-    return -ENOMEM;
-  }       
+		return -ENOMEM;
+	}       
 
-  if(sscanf(argv[1], "%llu", &start)!=1) {
-    ti->error = "dm-basic_target: Invalid device sector";
+	if(sscanf(argv[1], "%llu", &start)!=1) {
+		ti->error = "dm-basic_target: Invalid device sector";
 
-    goto bad;
-  }
+		goto bad;
+	}
 
-  mdt->start=(sector_t)start;
+	mdt->start=(sector_t)start;
 
-  if (dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &mdt->dev)) {
-    ti->error = "dm-basic_target: Device lookup failed";
+	if (dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &mdt->dev)) {
+		ti->error = "dm-basic_target: Device lookup failed";
 
-    goto bad;
-  }
+		goto bad;
+	}
 
-  ti->private = mdt;
+	ti->private = mdt;
                  
-  return 0;
+	return 0;
 
-  bad:
-        kfree(mdt);
-        printk(KERN_CRIT "\n>>out function basic_target_ctr with errorrrrrrrrrr \n");           
-        return -EINVAL;
+bad:
+	kfree(mdt);
+	printk(KERN_CRIT "\n>>out function basic_target_ctr with errorrrrrrrrrr \n");           
+	return -EINVAL;
 }    
 
 
@@ -207,10 +208,10 @@ static int dmp_map(struct dm_target *ti, struct bio *bio)
 static struct target_type dmp_target = {    
 	.name = "dmp",
 	.version = {1,0,0},
- 	.module = THIS_MODULE,
-  .ctr = dmp_ctr,
-  .dtr = dmp_dtr,
-  .map = dmp_map,
+	.module = THIS_MODULE,
+	.ctr = dmp_ctr,
+	.dtr = dmp_dtr,
+	.map = dmp_map,
 };
 
 /*
@@ -221,25 +222,26 @@ static int __init dmp_init(void)
 {
 	/* Here we should initialize resources and register target */
 	int result;
-  result = dm_register_target(&dmp_target);
+	result = dm_register_target(&dmp_target);
 
-  if(result < 0) {
- 	  printk(KERN_CRIT "\n Error in registering target \n");
-  }
+	if(result < 0) {
+		printk(KERN_CRIT "\n Error in registering target \n");
+	}
 
-  stat_kobject = kobject_create_and_add("stat", &THIS_MODULE->mkobj.kobj);
+	stat_kobject = kobject_create_and_add("stat", &THIS_MODULE->mkobj.kobj);
 
-  if (!stat_kobject) {
-  	return -ENOMEM;
-  }
+	if (!stat_kobject) {
+		return -ENOMEM;
+	}
 
-  int error;
-  error = sysfs_create_file(stat_kobject, &stat_attribute.attr);
-  if (error) {
-  	printk(KERN_CRIT "\n Error in creating sysfs_file \n");
-  }
+	int error;
+	error = sysfs_create_file(stat_kobject, &stat_attribute.attr);
 
-  return 0;
+	if (error) {
+		printk(KERN_CRIT "\n Error in creating sysfs_file \n");
+	}
+
+	return 0;
 }
 
 static void __exit dmp_exit(void)
