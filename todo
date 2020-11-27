@@ -1,0 +1,6 @@
+TO DO:
+	-optimize variables
+	-spin lock, read/write lock
+	-naming
+	-what about const SECTOR_SIZE (remove?)
+	-submit_bio
