@@ -9,7 +9,7 @@
 #define DM_MSG_PREFIX "dmp"
 
 /* Constant for counting statistics */
-static const int BIO_SECTOR_SIZE = 512;
+//static const int BIO_SECTOR_SIZE = 512;
 
 /*
  *	Statistics part
@@ -178,21 +178,21 @@ static int dmp_map(struct dm_target *ti, struct bio *bio)
 	bio_set_dev(bio, mdt->dev->bdev);
 
 	dmp_stat.total_queries += 1;
-	dmp_stat.avg_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+	dmp_stat.avg_block_size += bio_sectors(bio) * SECTOR_SIZE;
 
 	switch (bio_op(bio)) {
 
 		case REQ_OP_READ:
 
 			dmp_stat.read_query_count += 1;
-			dmp_stat.avg_read_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+			dmp_stat.avg_read_block_size += bio_sectors(bio) * SECTOR_SIZE;
 
 		break;
 
 		case REQ_OP_WRITE:
 
 			dmp_stat.write_query_count += 1;
-			dmp_stat.avg_write_block_size += bio_sectors(bio) * BIO_SECTOR_SIZE;
+			dmp_stat.avg_write_block_size += bio_sectors(bio) * SECTOR_SIZE;
 
 		break;
 
