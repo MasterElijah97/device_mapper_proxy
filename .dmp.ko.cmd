@@ -1,1 +1,0 @@
-cmd_/home/master/Desktop/device_mapper_proxy/dmp.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/master/Desktop/device_mapper_proxy/dmp.ko /home/master/Desktop/device_mapper_proxy/dmp.o /home/master/Desktop/device_mapper_proxy/dmp.mod.o;  true
