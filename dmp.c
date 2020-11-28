@@ -8,9 +8,6 @@
 
 #define DM_MSG_PREFIX "dmp"
 
-/* Constant for counting statistics */
-//static const int BIO_SECTOR_SIZE = 512;
-
 /*
  *	Statistics part
  */
@@ -21,22 +18,16 @@ struct statistics {
 	unsigned long long int write_query_count;
 	unsigned long long int read_query_count;
 
-	unsigned long long int avg_write_block_size;
-	unsigned long long int avg_read_block_size;
-
-	unsigned long long int total_queries;
-	unsigned long long int avg_block_size;
+	unsigned long long int write_sectors_count;
+	unsigned long long int read_sectors_count;
 };
 
 static struct statistics dmp_stat = {
 	.write_query_count = 0,
 	.read_query_count  = 0,
 
-	.avg_write_block_size = 0,
-	.avg_read_block_size  = 0,
-
-	.total_queries    = 0,
-	.avg_block_size   = 0,
+	.write_sectors_count = 0,
+	.read_sectors_count  = 0,
 };
 
 static ssize_t dmp_stat_show(struct kobject *kobj,
@@ -45,25 +36,31 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
 {
 	unsigned long long int avg_read_block_size;
 	unsigned long long int avg_write_block_size;
+	unsigned long long int total_queries;
 	unsigned long long int avg_block_size;
+
+	/* constant SECTOR_SIZE is defined in blkdev.h and equal 512 : SECTOR_SIZE (1 << 9) */	
 
 	if (dmp_stat.read_query_count > 0) {
 		avg_read_block_size = 
-		dmp_stat.avg_read_block_size / dmp_stat.read_query_count;
+		dmp_stat.read_sectors_count * SECTOR_SIZE / dmp_stat.read_query_count;
 	} else {
 		avg_read_block_size = 0;
 	}
 
 	if (dmp_stat.write_query_count > 0) {
 		avg_write_block_size = 
-		dmp_stat.avg_write_block_size / dmp_stat.write_query_count;
+		dmp_stat.write_sectors_count * SECTOR_SIZE / dmp_stat.write_query_count;
 	} else {
 		avg_write_block_size = 0;
 	}
+	
+	total_queries = 
+	dmp_stat.read_query_count + dmp_stat.write_query_count;
 
-	if (dmp_stat.total_queries > 0) {
+	if (total_queries > 0) {
 		avg_block_size = 
-		dmp_stat.avg_block_size / dmp_stat.total_queries;
+		(avg_read_block_size + avg_write_block_size) / 2;
 	} else {
 		avg_block_size = 0;
 	}
@@ -87,7 +84,7 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
 					dmp_stat.write_query_count,
 					avg_write_block_size,
 
-					dmp_stat.total_queries,
+					total_queries,
 					avg_block_size);
 }
 
@@ -177,22 +174,19 @@ static int dmp_map(struct dm_target *ti, struct bio *bio)
 
 	bio_set_dev(bio, mdt->dev->bdev);
 
-	dmp_stat.total_queries += 1;
-	dmp_stat.avg_block_size += bio_sectors(bio) * SECTOR_SIZE;
-
 	switch (bio_op(bio)) {
 
 		case REQ_OP_READ:
 
 			dmp_stat.read_query_count += 1;
-			dmp_stat.avg_read_block_size += bio_sectors(bio) * SECTOR_SIZE;
+			dmp_stat.read_sectors_count += bio_sectors(bio);
 
 		break;
 
 		case REQ_OP_WRITE:
 
 			dmp_stat.write_query_count += 1;
-			dmp_stat.avg_write_block_size += bio_sectors(bio) * SECTOR_SIZE;
+			dmp_stat.write_sectors_count += bio_sectors(bio);
 
 		break;
 
