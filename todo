@@ -1,2 +1,2 @@
 TO DO:
-	-spin lock, read/write lock
+	-spin lock, read/write lock (also look for another synch primitives)
