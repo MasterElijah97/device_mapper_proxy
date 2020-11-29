@@ -5,6 +5,7 @@
 #include <linux/init.h>
 #include <linux/bio.h>
 #include <linux/sysfs.h>
+#include <linux/rwlock_types.h>
 
 #define DM_MSG_PREFIX "dmp"
 
