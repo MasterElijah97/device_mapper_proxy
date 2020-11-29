@@ -8,6 +8,10 @@
 
 #define DM_MSG_PREFIX "dmp"
 
+/* Synchronization via read/write spinlock */
+
+DEFINE_RWLOCK(stat_rwlock);
+
 /*
  *	Statistics part
  */
@@ -39,7 +43,9 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
 	unsigned long long int total_queries;
 	unsigned long long int avg_block_size;
 
-	/* constant SECTOR_SIZE is defined in blkdev.h and equal 512 : SECTOR_SIZE (1 << 9) */	
+	/* constant SECTOR_SIZE is defined in blkdev.h and equal 512 : SECTOR_SIZE = (1 << 9) */	
+
+	read_lock(&stat_rwlock);
 
 	if (dmp_stat.read_query_count > 0) {
 		avg_read_block_size = 
@@ -64,6 +70,8 @@ static ssize_t dmp_stat_show(struct kobject *kobj,
 	} else {
 		avg_block_size = 0;
 	}
+
+	read_unlock(&stat_rwlock);
 
 	const char* text;
   	text = "\
@@ -174,6 +182,10 @@ static int dmp_map(struct dm_target *ti, struct bio *bio)
 
 	bio_set_dev(bio, mdt->dev->bdev);
 
+	//writing data to dmp_stats
+
+	write_lock(&stat_rwlock);
+
 	switch (bio_op(bio)) {
 
 		case REQ_OP_READ:
@@ -193,6 +205,8 @@ static int dmp_map(struct dm_target *ti, struct bio *bio)
 		default:
 			return DM_MAPIO_KILL;
 	}
+
+	write_unlock(&stat_rwlock);
         
 	submit_bio(bio);
 
